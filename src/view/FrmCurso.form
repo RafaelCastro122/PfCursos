@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="3"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="3"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="btnConsultarId" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="12" max="32767" attributes="0"/>
+                      <Component id="btnConsultar" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnActualizar" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnAgregar" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnEliminar" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lblIdCurso" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblNombreCurso" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblCreditos" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblCodigoCurso" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblAnioPensum" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="txtIdCurso" alignment="0" pref="250" max="32767" attributes="0"/>
+                          <Component id="txtNombreCurso" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtCreditos" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtCodigoCurso" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtAnioPensum" alignment="0" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane1" min="-2" pref="470" max="-2" attributes="0"/>
+              <EmptySpace pref="30" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblIdCurso" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtIdCurso" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblNombreCurso" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtNombreCurso" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblCreditos" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtCreditos" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblCodigoCurso" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtCodigoCurso" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblAnioPensum" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtAnioPensum" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="btnConsultarId" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnConsultar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnActualizar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnAgregar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnEliminar" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Component id="jScrollPane1" min="-2" pref="270" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="25" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="lblIdCurso">
+      <Properties><Property name="text" type="java.lang.String" value="ID del curso"/></Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblNombreCurso">
+      <Properties><Property name="text" type="java.lang.String" value="Nombre"/></Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblCreditos">
+      <Properties><Property name="text" type="java.lang.String" value="Creditos"/></Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblCodigoCurso">
+      <Properties><Property name="text" type="java.lang.String" value="Codigo"/></Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblAnioPensum">
+      <Properties><Property name="text" type="java.lang.String" value="Fecha de pensum (AAAA-MM-DD)"/></Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtIdCurso"/>
+    <Component class="javax.swing.JTextField" name="txtNombreCurso"/>
+    <Component class="javax.swing.JTextField" name="txtCreditos"/>
+    <Component class="javax.swing.JTextField" name="txtCodigoCurso"/>
+    <Component class="javax.swing.JTextField" name="txtAnioPensum"/>
+    <Component class="javax.swing.JButton" name="btnAgregar">
+      <Properties><Property name="text" type="java.lang.String" value="Insertar"/></Properties>
+      <Events><EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAgregarActionPerformed"/></Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnActualizar">
+      <Properties><Property name="text" type="java.lang.String" value="Actualizar"/></Properties>
+      <Events><EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnActualizarActionPerformed"/></Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnConsultar">
+      <Properties><Property name="text" type="java.lang.String" value="Consultar"/></Properties>
+      <Events><EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConsultarActionPerformed"/></Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnEliminar">
+      <Properties><Property name="text" type="java.lang.String" value="Eliminar"/></Properties>
+      <Events><EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEliminarActionPerformed"/></Events>
+    </Component>
+    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JTable" name="jTable1">
+          <Properties>
+            <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
+              <Table columnCount="5" rowCount="0">
+                <Column editable="false" title="ID" type="java.lang.Object"/>
+                <Column editable="false" title="Nombre" type="java.lang.Object"/>
+                <Column editable="false" title="Creditos" type="java.lang.Object"/>
+                <Column editable="false" title="Codigo" type="java.lang.Object"/>
+                <Column editable="false" title="Fecha de pensum" type="java.lang.Object"/>
+              </Table>
+            </Property>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.JButton" name="btnConsultarId">
+      <Properties><Property name="text" type="java.lang.String" value="Consultar ID"/></Properties>
+      <Events><EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConsultarIdActionPerformed"/></Events>
+    </Component>
+  </SubComponents>
+</Form>
