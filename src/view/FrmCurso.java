@@ -57,13 +57,16 @@ public class FrmCurso extends javax.swing.JFrame {
         btnConsultarId = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Gestion de Cursos");
 
         lblIdCurso.setText("ID del curso");
+
         lblNombreCurso.setText("Nombre");
+
         lblCreditos.setText("Creditos");
+
         lblCodigoCurso.setText("Codigo");
-        lblAnioPensum.setText("Fecha de pensum (AAAA-MM-DD)");
+
+        lblAnioPensum.setText("Fecha de inicio");
 
         btnAgregar.setText("Insertar");
         btnAgregar.addActionListener(this::btnAgregarActionPerformed);
@@ -78,9 +81,21 @@ public class FrmCurso extends javax.swing.JFrame {
         btnEliminar.addActionListener(this::btnEliminarActionPerformed);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {},
-            new String [] {"ID", "Nombre", "Creditos", "Codigo", "Fecha de pensum"}
-        ));
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Nombre", "Creditos", "Codigo", "Fecha de pensum"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         btnConsultarId.setText("Consultar ID");
@@ -95,7 +110,7 @@ public class FrmCurso extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnConsultarId)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
                         .addComponent(btnConsultar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnActualizar)
@@ -197,7 +212,7 @@ public class FrmCurso extends javax.swing.JFrame {
                 limpiarCampos();
                 JOptionPane.showMessageDialog(null, "Curso agregado correctamente");
             } else {
-                JOptionPane.showMessageDialog(null, "No se pudo agregar el curso. Revise el ID y la fecha.");
+                JOptionPane.showMessageDialog(null, "No se pudo agregar el curso.Por favor revise el ID y la fecha.");
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, "El ID y los creditos deben ser numeros enteros");
