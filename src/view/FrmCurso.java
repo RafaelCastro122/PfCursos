@@ -5,8 +5,15 @@
 package view;
 
 import controller.CursoController;
+import java.awt.Toolkit;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import model.Curso;
 
 /**
@@ -18,20 +25,31 @@ public class FrmCurso extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmCurso.class.getName());
     private final CursoController controlador = new CursoController();
     private final DefaultTableModel modeloTabla = new DefaultTableModel(
-            new Object[]{"ID", "Nombre", "Creditos", "Codigo", "Fecha de pensum"}, 0) {
+            new Object[]{"ID", "Nombre", "Creditos", "Codigo", "Fecha de inicio"}, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
         }
     };
 
+    private String idSeleccionado = null;
+
     /**
      * Creates new form FrmCurso
      */
     public FrmCurso() {
+        setContentPane(new PanelFondo());
         initComponents();
         jTable1.setModel(modeloTabla);
+        aplicarEstilo();
         setLocationRelativeTo(null);
+        configurarRestricciones();
+        jTable1.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                seleccionarFila();
+            }
+        });
+        nuevoCurso();
     }
 
     @SuppressWarnings("unchecked")
@@ -55,6 +73,9 @@ public class FrmCurso extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         btnConsultarId = new javax.swing.JButton();
+        btnNuevo = new javax.swing.JButton();
+        lblLogo = new javax.swing.JLabel();
+        sepLogo = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -101,6 +122,13 @@ public class FrmCurso extends javax.swing.JFrame {
         btnConsultarId.setText("Consultar ID");
         btnConsultarId.addActionListener(this::btnConsultarIdActionPerformed);
 
+        btnNuevo.setText("Nuevo");
+        btnNuevo.addActionListener(this::btnNuevoActionPerformed);
+
+        lblLogo.setText("<html><center>PEOPLE<br>MANAGERS</center></html>");
+
+        sepLogo.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -109,16 +137,10 @@ public class FrmCurso extends javax.swing.JFrame {
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnConsultarId)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
-                        .addComponent(btnConsultar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnActualizar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnAgregar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEliminar))
-                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
+                        .addComponent(sepLogo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(24, 24, 24)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblIdCurso)
                             .addComponent(lblNombreCurso)
@@ -127,49 +149,67 @@ public class FrmCurso extends javax.swing.JFrame {
                             .addComponent(lblAnioPensum))
                         .addGap(24, 24, 24)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtIdCurso, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                            .addComponent(txtIdCurso, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
                             .addComponent(txtNombreCurso)
                             .addComponent(txtCreditos)
                             .addComponent(txtCodigoCurso)
-                            .addComponent(txtAnioPensum))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(30, Short.MAX_VALUE))
+                            .addComponent(txtAnioPensum)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(100, 100, 100)
+                        .addComponent(btnNuevo)
+                        .addGap(10, 10, 10)
+                        .addComponent(btnConsultarId)
+                        .addGap(10, 10, 10)
+                        .addComponent(btnConsultar)
+                        .addGap(10, 10, 10)
+                        .addComponent(btnActualizar)
+                        .addGap(10, 10, 10)
+                        .addComponent(btnAgregar)
+                        .addGap(10, 10, 10)
+                        .addComponent(btnEliminar)))
+                .addGap(12, 12, 12)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 530, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(25, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(25, 25, 25)
+                .addGap(35, 35, 35)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(sepLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblIdCurso)
+                                    .addComponent(txtIdCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(12, 12, 12)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblNombreCurso)
+                                    .addComponent(txtNombreCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(12, 12, 12)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblCreditos)
+                                    .addComponent(txtCreditos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(12, 12, 12)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblCodigoCurso)
+                                    .addComponent(txtCodigoCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(12, 12, 12)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblAnioPensum)
+                                    .addComponent(txtAnioPensum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(22, 22, 22)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblIdCurso)
-                            .addComponent(txtIdCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblNombreCurso)
-                            .addComponent(txtNombreCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblCreditos)
-                            .addComponent(txtCreditos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblCodigoCurso)
-                            .addComponent(txtCodigoCurso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblAnioPensum)
-                            .addComponent(txtAnioPensum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnNuevo)
                             .addComponent(btnConsultarId)
                             .addComponent(btnConsultar)
                             .addComponent(btnActualizar)
                             .addComponent(btnAgregar)
                             .addComponent(btnEliminar)))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
         pack();
@@ -185,6 +225,9 @@ public class FrmCurso extends javax.swing.JFrame {
 
     private void btnConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarActionPerformed
         cargarCursos();
+        if (modeloTabla.getRowCount() == 0) {
+            mostrarInfo("No hay cursos registrados");
+        }
     }//GEN-LAST:event_btnConsultarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
@@ -195,13 +238,17 @@ public class FrmCurso extends javax.swing.JFrame {
         consultarId();
     }//GEN-LAST:event_btnConsultarIdActionPerformed
 
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
+        nuevoCurso();
+    }//GEN-LAST:event_btnNuevoActionPerformed
+
     private void agregarCurso() {
+        if (!camposCompletos()) {
+            return;
+        }
         try {
-            if (!camposCompletos()) {
-                return;
-            }
             boolean agregado = controlador.agregarCurso(
-                    Integer.parseInt(txtIdCurso.getText().trim()),
+                    txtIdCurso.getText().trim(),
                     txtNombreCurso.getText().trim(),
                     Integer.parseInt(txtCreditos.getText().trim()),
                     txtCodigoCurso.getText().trim(),
@@ -209,23 +256,27 @@ public class FrmCurso extends javax.swing.JFrame {
 
             if (agregado) {
                 cargarCursos();
-                limpiarCampos();
-                JOptionPane.showMessageDialog(null, "Curso agregado correctamente");
+                nuevoCurso();
+                mostrarInfo("Curso agregado correctamente");
             } else {
-                JOptionPane.showMessageDialog(null, "No se pudo agregar el curso.Por favor revise el ID y la fecha.");
+                mostrarError(controlador.getMensajeError());
             }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "El ID y los creditos deben ser numeros enteros");
+            mostrarError("Los creditos deben ser un numero entero");
         }
     }
 
     private void actualizarCurso() {
+        if (idSeleccionado == null) {
+            mostrarAviso("Seleccione un curso");
+            return;
+        }
+        if (!camposCompletos()) {
+            return;
+        }
         try {
-            if (!camposCompletos()) {
-                return;
-            }
             boolean actualizado = controlador.actualizarCurso(
-                    Integer.parseInt(txtIdCurso.getText().trim()),
+                    idSeleccionado,
                     txtNombreCurso.getText().trim(),
                     Integer.parseInt(txtCreditos.getText().trim()),
                     txtCodigoCurso.getText().trim(),
@@ -233,105 +284,114 @@ public class FrmCurso extends javax.swing.JFrame {
 
             if (actualizado) {
                 cargarCursos();
-                limpiarCampos();
-                JOptionPane.showMessageDialog(null, "Curso actualizado correctamente");
+                nuevoCurso();
+                mostrarInfo("Curso actualizado correctamente");
             } else {
-                JOptionPane.showMessageDialog(null, "El id no existe por favor ingresar uno valido");
+                mostrarError(controlador.getMensajeError());
             }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "El ID y los creditos deben ser numeros enteros");
+            mostrarError("Los creditos deben ser un numero entero");
         }
     }
 
     private void consultarId() {
-        String id = JOptionPane.showInputDialog("Ingresar el ID del curso a buscar");
+        String id = JOptionPane.showInputDialog(this, "Ingresar el ID del curso a buscar");
         if (id == null) {
             return;
         }
-        try {
-            int codigo = Integer.parseInt(id.trim());
+        if (id.trim().isEmpty()) {
+            mostrarAviso("Ingrese el ID del curso a buscar");
+            return;
+        }
+        if (!id.trim().matches("\\d{1," + Curso.ID_DIGITOS + "}")) {
+            mostrarError("El ID debe ser un numero entero de hasta " + Curso.ID_DIGITOS + " digitos");
+            return;
+        }
+        Curso curso = controlador.obtenerId(id.trim());
+        if (curso == null) {
+            mostrarAviso("Curso no encontrado");
+        } else {
             modeloTabla.setRowCount(0);
-            Curso curso = controlador.obtenerId(codigo);
-            if (curso == null) {
-                limpiarCampos();
-                JOptionPane.showMessageDialog(null, "El id no existe por favor ingresar uno valido");
-            } else {
-                mostrarCurso(curso);
-            }
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "El ID debe ser entero");
+            modeloTabla.addRow(filaDe(curso));
+            mostrarCurso(curso);
         }
     }
 
     public void cargarCursos() {
         modeloTabla.setRowCount(0);
         for (Curso curso : controlador.obtenerCursos()) {
-            modeloTabla.addRow(new Object[]{
-                curso.getIdCurso(),
-                curso.getNombreCurso(),
-                curso.getCreditoCurso(),
-                curso.getCodigoCurso(),
-                curso.getAnioPensum()
-            });
+            modeloTabla.addRow(filaDe(curso));
         }
     }
 
-    private void mostrarCurso(Curso curso) {
-        modeloTabla.addRow(new Object[]{
+    private Object[] filaDe(Curso curso) {
+        return new Object[]{
             curso.getIdCurso(),
             curso.getNombreCurso(),
             curso.getCreditoCurso(),
             curso.getCodigoCurso(),
             curso.getAnioPensum()
-        });
-        txtIdCurso.setText(Integer.toString(curso.getIdCurso()));
+        };
+    }
+
+    private void seleccionarFila() {
+        int fila = jTable1.getSelectedRow();
+        if (fila < 0) {
+            return;
+        }
+        mostrarCurso(new Curso(
+                String.valueOf(modeloTabla.getValueAt(fila, 0)),
+                String.valueOf(modeloTabla.getValueAt(fila, 1)),
+                Integer.parseInt(String.valueOf(modeloTabla.getValueAt(fila, 2))),
+                String.valueOf(modeloTabla.getValueAt(fila, 3)),
+                String.valueOf(modeloTabla.getValueAt(fila, 4))));
+    }
+
+    private void mostrarCurso(Curso curso) {
+        txtIdCurso.setText(curso.getIdCurso());
         txtNombreCurso.setText(curso.getNombreCurso());
         txtCreditos.setText(Integer.toString(curso.getCreditoCurso()));
         txtCodigoCurso.setText(curso.getCodigoCurso());
         txtAnioPensum.setText(curso.getAnioPensum());
+        idSeleccionado = curso.getIdCurso();
+        txtIdCurso.setEditable(false);
+        btnAgregar.setEnabled(false);
+        btnActualizar.setEnabled(true);
+        btnEliminar.setEnabled(true);
     }
 
     private void eliminarCurso() {
-        String id = JOptionPane.showInputDialog("Codigo del curso a eliminar");
-        if (id == null) {
+        if (idSeleccionado == null) {
+            mostrarAviso("Seleccione un curso");
             return;
         }
         int respuesta = JOptionPane.showConfirmDialog(
-                null,
-                "Desea eliminar este curso",
+                this,
+                "Desea eliminar el curso " + idSeleccionado + "?",
                 "Confirmar eliminacion",
                 JOptionPane.YES_NO_OPTION);
         if (respuesta != JOptionPane.YES_OPTION) {
             return;
         }
-        try {
-            boolean eliminado = controlador.eliminarCurso(Integer.parseInt(id.trim()));
-            if (eliminado) {
-                cargarCursos();
-                limpiarCampos();
-                JOptionPane.showMessageDialog(null, "Curso eliminado correctamente");
-            } else {
-                JOptionPane.showMessageDialog(null, "El id no existe por favor ingresar uno valido");
-            }
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "El ID debe ser entero");
+        boolean eliminado = controlador.eliminarCurso(idSeleccionado);
+        if (eliminado) {
+            cargarCursos();
+            nuevoCurso();
+            mostrarInfo("Curso eliminado correctamente");
+        } else {
+            mostrarError(controlador.getMensajeError());
         }
     }
 
     private boolean camposCompletos() {
-        if (txtIdCurso.getText().trim().isEmpty()
-                || txtNombreCurso.getText().trim().isEmpty()
-                || txtCreditos.getText().trim().isEmpty()
-                || txtCodigoCurso.getText().trim().isEmpty()
-                || txtAnioPensum.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Complete todos los campos");
-            return false;
-        }
-        try {
-            java.sql.Date.valueOf(txtAnioPensum.getText().trim());
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(null, "La fecha debe tener el formato AAAA-MM-DD");
-            return false;
+        JTextField[] campos = {txtIdCurso, txtNombreCurso, txtCreditos, txtCodigoCurso, txtAnioPensum};
+        String[] nombres = {"ID del curso", "Nombre", "Creditos", "Codigo", "Fecha de inicio"};
+        for (int i = 0; i < campos.length; i++) {
+            if (campos[i].getText().trim().isEmpty()) {
+                mostrarAviso("Complete el campo: " + nombres[i]);
+                campos[i].requestFocusInWindow();
+                return false;
+            }
         }
         return true;
     }
@@ -344,17 +404,93 @@ public class FrmCurso extends javax.swing.JFrame {
         txtAnioPensum.setText("");
     }
 
+    private void nuevoCurso() {
+        limpiarCampos();
+        idSeleccionado = null;
+        txtIdCurso.setEditable(true);
+        jTable1.clearSelection();
+        btnAgregar.setEnabled(true);
+        btnActualizar.setEnabled(false);
+        btnEliminar.setEnabled(false);
+        txtIdCurso.requestFocusInWindow();
+    }
+
+    private void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void mostrarAviso(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Aviso", JOptionPane.WARNING_MESSAGE);
+    }
+
+    private void mostrarInfo(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Informacion", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void aplicarEstilo() {
+        Estilo.logo(lblLogo);
+        Estilo.separador(sepLogo);
+        for (JLabel etiqueta : new JLabel[]{lblIdCurso, lblNombreCurso, lblCreditos, lblCodigoCurso, lblAnioPensum}) {
+            Estilo.etiqueta(etiqueta);
+        }
+        for (JTextField campo : new JTextField[]{txtIdCurso, txtNombreCurso, txtCreditos, txtCodigoCurso, txtAnioPensum}) {
+            Estilo.campo(campo);
+        }
+        Estilo.boton(btnNuevo, Iconos.mas());
+        Estilo.boton(btnConsultarId, Iconos.lupa());
+        Estilo.boton(btnConsultar, Iconos.lupa());
+        Estilo.boton(btnActualizar, Iconos.actualizar());
+        Estilo.boton(btnAgregar, Iconos.guardar());
+        Estilo.boton(btnEliminar, Iconos.basurero());
+        Estilo.tabla(jScrollPane1, jTable1);
+        pack();
+    }
+
+    private void configurarRestricciones() {
+        restringir(txtIdCurso, "\\d*", Curso.ID_DIGITOS);
+        restringir(txtCreditos, "\\d*", 2);
+        restringir(txtNombreCurso, ".*", Curso.LONGITUD_MAX);
+        restringir(txtCodigoCurso, ".*", Curso.LONGITUD_MAX);
+        restringir(txtAnioPensum, "[0-9-]*", 10);
+    }
+
+    private static void restringir(JTextField campo, String patron, int max) {
+        ((AbstractDocument) campo.getDocument()).setDocumentFilter(new FiltroTexto(patron, max));
+    }
+
+    private static class FiltroTexto extends DocumentFilter {
+
+        private final String patron;
+        private final int max;
+
+        FiltroTexto(String patron, int max) {
+            this.patron = patron;
+            this.max = max;
+        }
+
+        @Override
+        public void insertString(FilterBypass fb, int offset, String texto, AttributeSet attr) throws BadLocationException {
+            replace(fb, offset, 0, texto, attr);
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int largo, String texto, AttributeSet attr) throws BadLocationException {
+            String actual = fb.getDocument().getText(0, fb.getDocument().getLength());
+            String nuevo = actual.substring(0, offset) + (texto == null ? "" : texto) + actual.substring(offset + largo);
+            if (nuevo.length() <= max && nuevo.matches(patron)) {
+                super.replace(fb, offset, largo, texto, attr);
+            } else {
+                Toolkit.getDefaultToolkit().beep();
+            }
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
             logger.log(java.util.logging.Level.SEVERE, "No se pudo iniciar la ventana", ex);
         }
@@ -367,13 +503,16 @@ public class FrmCurso extends javax.swing.JFrame {
     private javax.swing.JButton btnConsultar;
     private javax.swing.JButton btnConsultarId;
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnNuevo;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblAnioPensum;
     private javax.swing.JLabel lblCodigoCurso;
     private javax.swing.JLabel lblCreditos;
     private javax.swing.JLabel lblIdCurso;
+    private javax.swing.JLabel lblLogo;
     private javax.swing.JLabel lblNombreCurso;
+    private javax.swing.JSeparator sepLogo;
     private javax.swing.JTextField txtAnioPensum;
     private javax.swing.JTextField txtCodigoCurso;
     private javax.swing.JTextField txtCreditos;

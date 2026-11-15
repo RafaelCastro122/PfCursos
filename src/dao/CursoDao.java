@@ -56,7 +56,7 @@ public class CursoDao {
 
             while (rs.next()) {
                 Curso curso = new Curso(
-                        rs.getInt("id_curso"),
+                        rs.getString("id_curso"),
                         rs.getString("nombre_curso"),
                         rs.getInt("credito_curso"),
                         rs.getString("codigo_curso"),
@@ -72,7 +72,7 @@ public class CursoDao {
         return lista;
     }
 
-    public Curso obtenerId(int id) {
+    public Curso obtenerId(String id) {
         Curso curso = null;
         String sql = "SELECT id_curso, nombre_curso, credito_curso, codigo_curso, \"año_pensum\" "
                 + "FROM cursos WHERE id_curso = ?";
@@ -87,12 +87,12 @@ public class CursoDao {
                 return null;
             }
             ps = conn.prepareStatement(sql);
-            ps.setInt(1, id);
+            ps.setString(1, id);
             rs = ps.executeQuery();
 
             if (rs.next()) {
                 curso = new Curso(
-                        rs.getInt("id_curso"),
+                        rs.getString("id_curso"),
                         rs.getString("nombre_curso"),
                         rs.getInt("credito_curso"),
                         rs.getString("codigo_curso"),
@@ -120,7 +120,7 @@ public class CursoDao {
                 return false;
             }
             ps = conn.prepareStatement(sql);
-            ps.setInt(1, curso.getIdCurso());
+            ps.setString(1, curso.getIdCurso());
             ps.setString(2, curso.getNombreCurso());
             ps.setInt(3, curso.getCreditoCurso());
             ps.setString(4, curso.getCodigoCurso());
@@ -151,7 +151,7 @@ public class CursoDao {
             ps.setInt(2, curso.getCreditoCurso());
             ps.setString(3, curso.getCodigoCurso());
             ps.setDate(4, java.sql.Date.valueOf(curso.getAnioPensum()));
-            ps.setInt(5, curso.getIdCurso());
+            ps.setString(5, curso.getIdCurso());
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -161,7 +161,7 @@ public class CursoDao {
         return false;
     }
 
-    public boolean eliminar(int id) {
+    public boolean eliminar(String id) {
         String sql = "DELETE FROM cursos WHERE id_curso = ?";
 
         Connection conn = null;
@@ -173,7 +173,7 @@ public class CursoDao {
                 return false;
             }
             ps = conn.prepareStatement(sql);
-            ps.setInt(1, id);
+            ps.setString(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
