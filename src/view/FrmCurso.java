@@ -6,38 +6,22 @@ package view;
 
 import controller.CursoController;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
-import java.awt.Toolkit;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
 import model.Curso;
 
 /**
  *
  * @author navas
  */
-public class FrmCurso extends javax.swing.JFrame implements VistaCurso {
+public class FrmCurso extends javax.swing.JFrame {
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmCurso.class.getName());
-    private final CursoController controlador = new CursoController();
-    private final DefaultTableModel modeloTabla = new DefaultTableModel(
-            new Object[]{"ID", "Nombre", "Creditos", "Codigo", "Fecha de inicio"}, 0) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-    };
-
+    private CursoController controlador = new CursoController();
+    private DefaultTableModel modeloTabla;
     private String idSeleccionado = null;
 
     /**
@@ -45,17 +29,23 @@ public class FrmCurso extends javax.swing.JFrame implements VistaCurso {
      */
     public FrmCurso() {
         initComponents();
-        controlador.setVista(this);
-        jTable1.setModel(modeloTabla);
-        configurarEncabezadoTabla();
         setLocationRelativeTo(null);
-        configurarRestricciones();
-        jTable1.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                seleccionarFila();
-            }
-        });
-        nuevoCurso();
+        controlador.setVista(this);
+        modeloTabla = (DefaultTableModel) jTable1.getModel();
+
+        jTable1.getTableHeader().setBackground(new Color(15, 52, 96));
+        jTable1.getTableHeader().setForeground(Color.WHITE);
+        jTable1.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+
+        ponerFiltro(txtIdCurso, "[0-9]*", 3);
+        ponerFiltro(txtCreditos, "[0-9]*", 2);
+        ponerFiltro(txtNombreCurso, ".*", 100);
+        ponerFiltro(txtCodigoCurso, ".*", 100);
+        ponerFiltro(txtAnioPensum, "[0-9-]*", 10);
+
+        jTable1.getSelectionModel().addListSelectionListener(e -> seleccionarFila());
+
+        limpiarFormulario();
     }
 
     @SuppressWarnings("unchecked")
@@ -346,7 +336,7 @@ public class FrmCurso extends javax.swing.JFrame implements VistaCurso {
     private void btnConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarActionPerformed
         cargarCursos();
         if (modeloTabla.getRowCount() == 0) {
-            mostrarInfo("No hay cursos registrados");
+            mostrarMensaje("No hay cursos registrados");
         }
     }//GEN-LAST:event_btnConsultarActionPerformed
 
@@ -359,7 +349,7 @@ public class FrmCurso extends javax.swing.JFrame implements VistaCurso {
     }//GEN-LAST:event_btnConsultarIdActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
-        nuevoCurso();
+        limpiarFormulario();
     }//GEN-LAST:event_btnNuevoActionPerformed
 
     private void agregarCurso() {
@@ -398,219 +388,168 @@ public class FrmCurso extends javax.swing.JFrame implements VistaCurso {
         }
     }
 
+    private void eliminarCurso() {
+        if (idSeleccionado == null) {
+            mostrarAviso("Seleccione un curso");
+            return;
+        }
+        int respuesta = JOptionPane.showConfirmDialog(this,
+                "Desea eliminar el curso " + idSeleccionado + "?",
+                "Confirmar eliminacion",
+                JOptionPane.YES_NO_OPTION);
+        if (respuesta == JOptionPane.YES_OPTION) {
+            controlador.eliminarCurso(idSeleccionado);
+        }
+    }
+
     private void consultarId() {
         String id = JOptionPane.showInputDialog(this, "Ingresar el ID del curso a buscar");
         if (id == null) {
             return;
         }
-        if (id.trim().isEmpty()) {
+        id = id.trim();
+        if (id.isEmpty()) {
             mostrarAviso("Ingrese el ID del curso a buscar");
             return;
         }
-        if (!id.trim().matches("\\d{1," + Curso.ID_DIGITOS + "}")) {
-            mostrarError("El ID debe ser un numero entero de hasta " + Curso.ID_DIGITOS + " digitos");
+        if (!id.matches("[0-9]{1,3}")) {
+            mostrarError("El ID debe ser un numero entero de hasta 3 digitos");
             return;
         }
-        Curso curso = controlador.obtenerId(id.trim());
+        Curso curso = controlador.obtenerId(id);
         if (curso == null) {
             mostrarAviso("Curso no encontrado");
-        } else {
-            modeloTabla.setRowCount(0);
-            modeloTabla.addRow(filaDe(curso));
-            mostrarCurso(curso);
+            return;
         }
+        modeloTabla.setRowCount(0);
+        agregarFila(curso);
+        mostrarCurso(curso);
     }
 
     public void cargarCursos() {
         modeloTabla.setRowCount(0);
         for (Curso curso : controlador.obtenerCursos()) {
-            modeloTabla.addRow(filaDe(curso));
+            agregarFila(curso);
         }
     }
 
-    private Object[] filaDe(Curso curso) {
-        return new Object[]{
+    private void agregarFila(Curso curso) {
+        Object[] fila = {
             curso.getIdCurso(),
             curso.getNombreCurso(),
             curso.getCreditoCurso(),
             curso.getCodigoCurso(),
             curso.getAnioPensum()
         };
+        modeloTabla.addRow(fila);
     }
 
     private void seleccionarFila() {
         int fila = jTable1.getSelectedRow();
-        if (fila < 0) {
+        if (fila == -1) {
             return;
         }
-        mostrarCurso(new Curso(
-                String.valueOf(modeloTabla.getValueAt(fila, 0)),
-                String.valueOf(modeloTabla.getValueAt(fila, 1)),
-                Integer.parseInt(String.valueOf(modeloTabla.getValueAt(fila, 2))),
-                String.valueOf(modeloTabla.getValueAt(fila, 3)),
-                String.valueOf(modeloTabla.getValueAt(fila, 4))));
+        txtIdCurso.setText(String.valueOf(modeloTabla.getValueAt(fila, 0)));
+        txtNombreCurso.setText(String.valueOf(modeloTabla.getValueAt(fila, 1)));
+        txtCreditos.setText(String.valueOf(modeloTabla.getValueAt(fila, 2)));
+        txtCodigoCurso.setText(String.valueOf(modeloTabla.getValueAt(fila, 3)));
+        txtAnioPensum.setText(String.valueOf(modeloTabla.getValueAt(fila, 4)));
+        modoEditar();
     }
 
     private void mostrarCurso(Curso curso) {
         txtIdCurso.setText(curso.getIdCurso());
         txtNombreCurso.setText(curso.getNombreCurso());
-        txtCreditos.setText(Integer.toString(curso.getCreditoCurso()));
+        txtCreditos.setText(String.valueOf(curso.getCreditoCurso()));
         txtCodigoCurso.setText(curso.getCodigoCurso());
         txtAnioPensum.setText(curso.getAnioPensum());
-        idSeleccionado = curso.getIdCurso();
+        modoEditar();
+    }
+
+    private void modoEditar() {
+        idSeleccionado = txtIdCurso.getText();
         txtIdCurso.setEditable(false);
         txtIdCurso.setBackground(new Color(230, 236, 242));
-        habilitarBoton(btnAgregar, false);
-        habilitarBoton(btnActualizar, true);
-        habilitarBoton(btnEliminar, true);
+        activarBoton(btnAgregar, false);
+        activarBoton(btnActualizar, true);
+        activarBoton(btnEliminar, true);
     }
 
-    private void eliminarCurso() {
-        if (idSeleccionado == null) {
-            mostrarAviso("Seleccione un curso");
-            return;
-        }
-        int respuesta = JOptionPane.showConfirmDialog(
-                this,
-                "Desea eliminar el curso " + idSeleccionado + "?",
-                "Confirmar eliminacion",
-                JOptionPane.YES_NO_OPTION);
-        if (respuesta != JOptionPane.YES_OPTION) {
-            return;
-        }
-        controlador.eliminarCurso(idSeleccionado);
-    }
-
-    private boolean camposCompletos() {
-        JTextField[] campos = {txtIdCurso, txtNombreCurso, txtCreditos, txtCodigoCurso, txtAnioPensum};
-        String[] nombres = {"ID del curso", "Nombre", "Creditos", "Codigo", "Fecha de inicio"};
-        for (int i = 0; i < campos.length; i++) {
-            if (campos[i].getText().trim().isEmpty()) {
-                mostrarAviso("Complete el campo: " + nombres[i]);
-                campos[i].requestFocusInWindow();
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void limpiarCampos() {
+    public void limpiarFormulario() {
         txtIdCurso.setText("");
         txtNombreCurso.setText("");
         txtCreditos.setText("");
         txtCodigoCurso.setText("");
         txtAnioPensum.setText("");
-    }
-
-    private void nuevoCurso() {
-        limpiarCampos();
         idSeleccionado = null;
         txtIdCurso.setEditable(true);
         txtIdCurso.setBackground(Color.WHITE);
         jTable1.clearSelection();
-        habilitarBoton(btnAgregar, true);
-        habilitarBoton(btnActualizar, false);
-        habilitarBoton(btnEliminar, false);
+        activarBoton(btnAgregar, true);
+        activarBoton(btnActualizar, false);
+        activarBoton(btnEliminar, false);
         txtIdCurso.requestFocusInWindow();
     }
 
-    @Override
+    private boolean camposCompletos() {
+        if (txtIdCurso.getText().trim().isEmpty()) {
+            mostrarAviso("Complete el campo: ID del curso");
+            txtIdCurso.requestFocusInWindow();
+            return false;
+        }
+        if (txtNombreCurso.getText().trim().isEmpty()) {
+            mostrarAviso("Complete el campo: Nombre");
+            txtNombreCurso.requestFocusInWindow();
+            return false;
+        }
+        if (txtCreditos.getText().trim().isEmpty()) {
+            mostrarAviso("Complete el campo: Creditos");
+            txtCreditos.requestFocusInWindow();
+            return false;
+        }
+        if (txtCodigoCurso.getText().trim().isEmpty()) {
+            mostrarAviso("Complete el campo: Codigo");
+            txtCodigoCurso.requestFocusInWindow();
+            return false;
+        }
+        if (txtAnioPensum.getText().trim().isEmpty()) {
+            mostrarAviso("Complete el campo: Fecha de inicio");
+            txtAnioPensum.requestFocusInWindow();
+            return false;
+        }
+        return true;
+    }
+
+    private void activarBoton(JButton boton, boolean activo) {
+        boton.setEnabled(activo);
+        if (activo) {
+            boton.setBackground(new Color(15, 52, 96));
+        } else {
+            boton.setBackground(new Color(203, 212, 222));
+        }
+    }
+
+    private void ponerFiltro(JTextField campo, String permitidos, int maximo) {
+        AbstractDocument documento = (AbstractDocument) campo.getDocument();
+        documento.setDocumentFilter(new FiltroTexto(permitidos, maximo));
+    }
+
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Informacion", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     public void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-    }
-
-    @Override
-    public void mostrarMensaje(String mensaje) {
-        mostrarInfo(mensaje);
-    }
-
-    @Override
-    public void limpiar() {
-        nuevoCurso();
-    }
-
-    @Override
-    public void refrescarTabla() {
-        cargarCursos();
     }
 
     private void mostrarAviso(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Aviso", JOptionPane.WARNING_MESSAGE);
     }
 
-    private void mostrarInfo(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Informacion", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void configurarEncabezadoTabla() {
-        jTable1.getTableHeader().setReorderingAllowed(false);
-        jTable1.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable tabla, Object valor, boolean seleccionada,
-                    boolean foco, int fila, int columna) {
-                super.getTableCellRendererComponent(tabla, valor, false, false, fila, columna);
-                setBackground(new Color(15, 52, 96));
-                setForeground(Color.WHITE);
-                setFont(new Font("Segoe UI", Font.BOLD, 13));
-                setBorder(BorderFactory.createEmptyBorder(7, 10, 7, 10));
-                return this;
-            }
-        });
-    }
-
-    private void habilitarBoton(JButton boton, boolean habilitado) {
-        boton.setEnabled(habilitado);
-        boton.setBackground(habilitado ? new Color(15, 52, 96) : new Color(203, 212, 222));
-    }
-
-    private void configurarRestricciones() {
-        restringir(txtIdCurso, "\\d*", Curso.ID_DIGITOS);
-        restringir(txtCreditos, "\\d*", 2);
-        restringir(txtNombreCurso, ".*", Curso.LONGITUD_MAX);
-        restringir(txtCodigoCurso, ".*", Curso.LONGITUD_MAX);
-        restringir(txtAnioPensum, "[0-9-]*", 10);
-    }
-
-    private static void restringir(JTextField campo, String patron, int max) {
-        ((AbstractDocument) campo.getDocument()).setDocumentFilter(new FiltroTexto(patron, max));
-    }
-
-    private static class FiltroTexto extends DocumentFilter {
-
-        private final String patron;
-        private final int max;
-
-        FiltroTexto(String patron, int max) {
-            this.patron = patron;
-            this.max = max;
-        }
-
-        @Override
-        public void insertString(FilterBypass fb, int offset, String texto, AttributeSet attr) throws BadLocationException {
-            replace(fb, offset, 0, texto, attr);
-        }
-
-        @Override
-        public void replace(FilterBypass fb, int offset, int largo, String texto, AttributeSet attr) throws BadLocationException {
-            String actual = fb.getDocument().getText(0, fb.getDocument().getLength());
-            String nuevo = actual.substring(0, offset) + (texto == null ? "" : texto) + actual.substring(offset + largo);
-            if (nuevo.length() <= max && nuevo.matches(patron)) {
-                super.replace(fb, offset, largo, texto, attr);
-            } else {
-                Toolkit.getDefaultToolkit().beep();
-            }
-        }
-    }
-
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        try {
-            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, "No se pudo iniciar la ventana", ex);
-        }
         java.awt.EventQueue.invokeLater(() -> new FrmCurso().setVisible(true));
     }
 

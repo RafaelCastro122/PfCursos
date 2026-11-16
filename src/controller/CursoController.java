@@ -4,15 +4,15 @@ import dao.CursoDao;
 import java.util.ArrayList;
 import java.util.List;
 import model.Curso;
-import view.VistaCurso;
+import view.FrmCurso;
 
 public class CursoController {
 
-    private final CursoDao dao = new CursoDao();
-    private VistaCurso vista;
+    private CursoDao dao = new CursoDao();
+    private FrmCurso vista;
     private String mensajeError = "";
 
-    public void setVista(VistaCurso vista) {
+    public void setVista(FrmCurso vista) {
         this.vista = vista;
     }
 
@@ -31,8 +31,8 @@ public class CursoController {
     private boolean exito(String mensaje) {
         mensajeError = "";
         if (vista != null) {
-            vista.refrescarTabla();
-            vista.limpiar();
+            vista.cargarCursos();
+            vista.limpiarFormulario();
             vista.mostrarMensaje(mensaje);
         }
         return true;
@@ -40,7 +40,7 @@ public class CursoController {
 
     public Curso obtenerId(String id) {
         try {
-            return dao.obtenerId(Curso.normalizarId(id));
+            return dao.obtenerId(Curso.completarId(id));
         } catch (RuntimeException ex) {
             error("Error al consultar la base de datos");
             return null;
@@ -58,7 +58,7 @@ public class CursoController {
 
     public boolean agregarCurso(String id, String nombre, int creditos, String codigo, String anioPensum) {
         try {
-            Curso curso = new Curso(Curso.normalizarId(id), nombre, creditos, codigo, anioPensum);
+            Curso curso = new Curso(Curso.completarId(id), nombre, creditos, codigo, anioPensum);
             curso.validar();
             if (dao.obtenerId(curso.getIdCurso()) != null) {
                 return error("El curso ya existe");
@@ -76,7 +76,7 @@ public class CursoController {
 
     public boolean actualizarCurso(String id, String nombre, int creditos, String codigo, String anioPensum) {
         try {
-            Curso curso = new Curso(Curso.normalizarId(id), nombre, creditos, codigo, anioPensum);
+            Curso curso = new Curso(Curso.completarId(id), nombre, creditos, codigo, anioPensum);
             curso.validar();
             if (!dao.actualizar(curso)) {
                 return error("El curso no existe");
@@ -91,7 +91,7 @@ public class CursoController {
 
     public boolean eliminarCurso(String id) {
         try {
-            if (!dao.eliminar(Curso.normalizarId(id))) {
+            if (!dao.eliminar(Curso.completarId(id))) {
                 return error("El curso no existe");
             }
             return exito("Curso eliminado correctamente");

@@ -1,21 +1,9 @@
 package model;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
-import java.util.Objects;
 
 public class Curso {
-
-    public static final int CREDITOS_MIN = 1;
-    public static final int CREDITOS_MAX = 10;
-    public static final int LONGITUD_MAX = 100;
-
-    private static final DateTimeFormatter FORMATO_FECHA =
-            DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
-
-    public static final int ID_DIGITOS = 3;
 
     private String idCurso;
     private String nombreCurso;
@@ -42,51 +30,56 @@ public class Curso {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID es obligatorio");
         }
-        if (!id.matches("\\d{" + ID_DIGITOS + "}")) {
-            throw new IllegalArgumentException("El ID debe tener " + ID_DIGITOS + " digitos (ej. 096)");
+        if (!id.matches("[0-9]{3}")) {
+            throw new IllegalArgumentException("El ID debe tener 3 digitos (ej. 096)");
         }
         if (id.equals("000")) {
             throw new IllegalArgumentException("El ID no puede ser 000");
         }
     }
 
-    public static String normalizarId(String id) {
+    public static String completarId(String id) {
         if (id == null) {
             return null;
         }
-        String limpio = id.trim();
-        if (limpio.matches("\\d{1," + ID_DIGITOS + "}")) {
-            return "0".repeat(ID_DIGITOS - limpio.length()) + limpio;
+        id = id.trim();
+        if (id.matches("[0-9]{1,3}")) {
+            while (id.length() < 3) {
+                id = "0" + id;
+            }
         }
-        return limpio;
+        return id;
     }
 
     public static void validarNombre(String nombre) {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre es obligatorio");
         }
-        if (nombre.length() > LONGITUD_MAX) {
-            throw new IllegalArgumentException("El nombre no puede tener mas de " + LONGITUD_MAX + " caracteres");
+        if (nombre.length() > 100) {
+            throw new IllegalArgumentException("El nombre no puede tener mas de 100 caracteres");
         }
-        if (!nombre.matches("[\\p{L} ]+")) {
+        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
             throw new IllegalArgumentException("El nombre solo puede contener letras y espacios");
         }
     }
 
     public static void validarCreditos(int creditos) {
-        if (creditos < CREDITOS_MIN || creditos > CREDITOS_MAX) {
-            throw new IllegalArgumentException("Los creditos deben estar entre " + CREDITOS_MIN + " y " + CREDITOS_MAX);
+        if (creditos < 1 || creditos > 10) {
+            throw new IllegalArgumentException("Los creditos deben estar entre 1 y 10");
         }
     }
 
     public static void validarFecha(String fecha) {
-        LocalDate f;
+        if (fecha == null) {
+            throw new IllegalArgumentException("La fecha debe tener el formato AAAA-MM-DD y ser una fecha valida");
+        }
+        LocalDate fechaCurso;
         try {
-            f = LocalDate.parse(fecha == null ? "" : fecha.trim(), FORMATO_FECHA);
+            fechaCurso = LocalDate.parse(fecha.trim());
         } catch (DateTimeParseException ex) {
             throw new IllegalArgumentException("La fecha debe tener el formato AAAA-MM-DD y ser una fecha valida");
         }
-        if (f.isAfter(LocalDate.now())) {
+        if (fechaCurso.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("La fecha no puede ser futura");
         }
     }
@@ -141,18 +134,19 @@ public class Curso {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    public boolean equals(Object objeto) {
+        if (objeto instanceof Curso) {
+            Curso otro = (Curso) objeto;
+            return idCurso != null && idCurso.equals(otro.getIdCurso());
         }
-        if (!(o instanceof Curso)) {
-            return false;
-        }
-        return Objects.equals(idCurso, ((Curso) o).idCurso);
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idCurso);
+        if (idCurso == null) {
+            return 0;
+        }
+        return idCurso.hashCode();
     }
 }
