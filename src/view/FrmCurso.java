@@ -5,10 +5,16 @@
 package view;
 
 import controller.CursoController;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.Toolkit;
-import javax.swing.JLabel;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -20,7 +26,7 @@ import model.Curso;
  *
  * @author navas
  */
-public class FrmCurso extends javax.swing.JFrame {
+public class FrmCurso extends javax.swing.JFrame implements VistaCurso {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrmCurso.class.getName());
     private final CursoController controlador = new CursoController();
@@ -38,10 +44,10 @@ public class FrmCurso extends javax.swing.JFrame {
      * Creates new form FrmCurso
      */
     public FrmCurso() {
-        setContentPane(new PanelFondo());
         initComponents();
+        controlador.setVista(this);
         jTable1.setModel(modeloTabla);
-        aplicarEstilo();
+        configurarEncabezadoTabla();
         setLocationRelativeTo(null);
         configurarRestricciones();
         jTable1.getSelectionModel().addListSelectionListener(e -> {
@@ -79,34 +85,116 @@ public class FrmCurso extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        lblIdCurso.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblIdCurso.setForeground(new java.awt.Color(15, 52, 96));
         lblIdCurso.setText("ID del curso");
 
+        lblNombreCurso.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblNombreCurso.setForeground(new java.awt.Color(15, 52, 96));
         lblNombreCurso.setText("Nombre");
 
+        lblCreditos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblCreditos.setForeground(new java.awt.Color(15, 52, 96));
         lblCreditos.setText("Creditos");
 
+        lblCodigoCurso.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblCodigoCurso.setForeground(new java.awt.Color(15, 52, 96));
         lblCodigoCurso.setText("Codigo");
 
+        lblAnioPensum.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblAnioPensum.setForeground(new java.awt.Color(15, 52, 96));
         lblAnioPensum.setText("Fecha de inicio");
 
+        txtIdCurso.setBackground(new java.awt.Color(255, 255, 255));
+        txtIdCurso.setBorder(javax.swing.BorderFactory.createCompoundBorder(new javax.swing.border.LineBorder(new java.awt.Color(185, 199, 214), 1, true), javax.swing.BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+        txtIdCurso.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtIdCurso.setForeground(new java.awt.Color(15, 52, 96));
+
+        txtNombreCurso.setBackground(new java.awt.Color(255, 255, 255));
+        txtNombreCurso.setBorder(javax.swing.BorderFactory.createCompoundBorder(new javax.swing.border.LineBorder(new java.awt.Color(185, 199, 214), 1, true), javax.swing.BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+        txtNombreCurso.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtNombreCurso.setForeground(new java.awt.Color(15, 52, 96));
+
+        txtCreditos.setBackground(new java.awt.Color(255, 255, 255));
+        txtCreditos.setBorder(javax.swing.BorderFactory.createCompoundBorder(new javax.swing.border.LineBorder(new java.awt.Color(185, 199, 214), 1, true), javax.swing.BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+        txtCreditos.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtCreditos.setForeground(new java.awt.Color(15, 52, 96));
+
+        txtCodigoCurso.setBackground(new java.awt.Color(255, 255, 255));
+        txtCodigoCurso.setBorder(javax.swing.BorderFactory.createCompoundBorder(new javax.swing.border.LineBorder(new java.awt.Color(185, 199, 214), 1, true), javax.swing.BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+        txtCodigoCurso.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtCodigoCurso.setForeground(new java.awt.Color(15, 52, 96));
+
+        txtAnioPensum.setBackground(new java.awt.Color(255, 255, 255));
+        txtAnioPensum.setBorder(javax.swing.BorderFactory.createCompoundBorder(new javax.swing.border.LineBorder(new java.awt.Color(185, 199, 214), 1, true), javax.swing.BorderFactory.createEmptyBorder(4, 8, 4, 8)));
+        txtAnioPensum.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtAnioPensum.setForeground(new java.awt.Color(15, 52, 96));
+
+        btnAgregar.setBackground(new java.awt.Color(15, 52, 96));
+        btnAgregar.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        btnAgregar.setContentAreaFilled(false);
+        btnAgregar.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/img/guardar_gris.png"))); // NOI18N
+        btnAgregar.setFocusPainted(false);
+        btnAgregar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/guardar.png"))); // NOI18N
+        btnAgregar.setIconTextGap(6);
+        btnAgregar.setOpaque(true);
         btnAgregar.setText("Insertar");
         btnAgregar.addActionListener(this::btnAgregarActionPerformed);
 
+        btnActualizar.setBackground(new java.awt.Color(15, 52, 96));
+        btnActualizar.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        btnActualizar.setContentAreaFilled(false);
+        btnActualizar.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/img/actualizar_gris.png"))); // NOI18N
+        btnActualizar.setFocusPainted(false);
+        btnActualizar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnActualizar.setForeground(new java.awt.Color(255, 255, 255));
+        btnActualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/actualizar.png"))); // NOI18N
+        btnActualizar.setIconTextGap(6);
+        btnActualizar.setOpaque(true);
         btnActualizar.setText("Actualizar");
         btnActualizar.addActionListener(this::btnActualizarActionPerformed);
 
+        btnConsultar.setBackground(new java.awt.Color(15, 52, 96));
+        btnConsultar.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        btnConsultar.setContentAreaFilled(false);
+        btnConsultar.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/img/lupa_gris.png"))); // NOI18N
+        btnConsultar.setFocusPainted(false);
+        btnConsultar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnConsultar.setForeground(new java.awt.Color(255, 255, 255));
+        btnConsultar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/lupa.png"))); // NOI18N
+        btnConsultar.setIconTextGap(6);
+        btnConsultar.setOpaque(true);
         btnConsultar.setText("Consultar");
         btnConsultar.addActionListener(this::btnConsultarActionPerformed);
 
+        btnEliminar.setBackground(new java.awt.Color(15, 52, 96));
+        btnEliminar.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        btnEliminar.setContentAreaFilled(false);
+        btnEliminar.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/img/basurero_gris.png"))); // NOI18N
+        btnEliminar.setFocusPainted(false);
+        btnEliminar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/basurero.png"))); // NOI18N
+        btnEliminar.setIconTextGap(6);
+        btnEliminar.setOpaque(true);
         btnEliminar.setText("Eliminar");
         btnEliminar.addActionListener(this::btnEliminarActionPerformed);
 
+        jScrollPane1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(15, 52, 96), 1, true));
+
+        jTable1.setBackground(new java.awt.Color(255, 255, 255));
+        jTable1.setFillsViewportHeight(true);
+        jTable1.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        jTable1.setForeground(new java.awt.Color(15, 52, 96));
+        jTable1.setGridColor(new java.awt.Color(220, 229, 238));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "ID", "Nombre", "Creditos", "Codigo", "Fecha de pensum"
+                "ID", "Nombre", "Creditos", "Codigo", "Fecha de inicio"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -117,16 +205,48 @@ public class FrmCurso extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.setRowHeight(26);
+        jTable1.setSelectionBackground(new java.awt.Color(169, 222, 223));
+        jTable1.setSelectionForeground(new java.awt.Color(15, 52, 96));
+        jTable1.setShowVerticalLines(false);
         jScrollPane1.setViewportView(jTable1);
 
+        btnConsultarId.setBackground(new java.awt.Color(15, 52, 96));
+        btnConsultarId.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        btnConsultarId.setContentAreaFilled(false);
+        btnConsultarId.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/img/lupa_gris.png"))); // NOI18N
+        btnConsultarId.setFocusPainted(false);
+        btnConsultarId.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnConsultarId.setForeground(new java.awt.Color(255, 255, 255));
+        btnConsultarId.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/lupa.png"))); // NOI18N
+        btnConsultarId.setIconTextGap(6);
+        btnConsultarId.setOpaque(true);
         btnConsultarId.setText("Consultar ID");
         btnConsultarId.addActionListener(this::btnConsultarIdActionPerformed);
 
+        btnNuevo.setBackground(new java.awt.Color(15, 52, 96));
+        btnNuevo.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        btnNuevo.setContentAreaFilled(false);
+        btnNuevo.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/img/mas_gris.png"))); // NOI18N
+        btnNuevo.setFocusPainted(false);
+        btnNuevo.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnNuevo.setForeground(new java.awt.Color(255, 255, 255));
+        btnNuevo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/mas.png"))); // NOI18N
+        btnNuevo.setIconTextGap(6);
+        btnNuevo.setOpaque(true);
         btnNuevo.setText("Nuevo");
         btnNuevo.addActionListener(this::btnNuevoActionPerformed);
 
+        lblLogo.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
+        lblLogo.setForeground(new java.awt.Color(15, 52, 96));
+        lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo.png"))); // NOI18N
         lblLogo.setText("<html><center>PEOPLE<br>MANAGERS</center></html>");
+        lblLogo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lblLogo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
+        sepLogo.setBackground(new java.awt.Color(79, 184, 189));
+        sepLogo.setForeground(new java.awt.Color(79, 184, 189));
         sepLogo.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -174,7 +294,7 @@ public class FrmCurso extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(35, 35, 35)
+                .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -209,7 +329,7 @@ public class FrmCurso extends javax.swing.JFrame {
                             .addComponent(btnAgregar)
                             .addComponent(btnEliminar)))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(95, Short.MAX_VALUE))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         pack();
@@ -247,20 +367,12 @@ public class FrmCurso extends javax.swing.JFrame {
             return;
         }
         try {
-            boolean agregado = controlador.agregarCurso(
+            controlador.agregarCurso(
                     txtIdCurso.getText().trim(),
                     txtNombreCurso.getText().trim(),
                     Integer.parseInt(txtCreditos.getText().trim()),
                     txtCodigoCurso.getText().trim(),
                     txtAnioPensum.getText().trim());
-
-            if (agregado) {
-                cargarCursos();
-                nuevoCurso();
-                mostrarInfo("Curso agregado correctamente");
-            } else {
-                mostrarError(controlador.getMensajeError());
-            }
         } catch (NumberFormatException ex) {
             mostrarError("Los creditos deben ser un numero entero");
         }
@@ -275,20 +387,12 @@ public class FrmCurso extends javax.swing.JFrame {
             return;
         }
         try {
-            boolean actualizado = controlador.actualizarCurso(
+            controlador.actualizarCurso(
                     idSeleccionado,
                     txtNombreCurso.getText().trim(),
                     Integer.parseInt(txtCreditos.getText().trim()),
                     txtCodigoCurso.getText().trim(),
                     txtAnioPensum.getText().trim());
-
-            if (actualizado) {
-                cargarCursos();
-                nuevoCurso();
-                mostrarInfo("Curso actualizado correctamente");
-            } else {
-                mostrarError(controlador.getMensajeError());
-            }
         } catch (NumberFormatException ex) {
             mostrarError("Los creditos deben ser un numero entero");
         }
@@ -355,9 +459,10 @@ public class FrmCurso extends javax.swing.JFrame {
         txtAnioPensum.setText(curso.getAnioPensum());
         idSeleccionado = curso.getIdCurso();
         txtIdCurso.setEditable(false);
-        btnAgregar.setEnabled(false);
-        btnActualizar.setEnabled(true);
-        btnEliminar.setEnabled(true);
+        txtIdCurso.setBackground(new Color(230, 236, 242));
+        habilitarBoton(btnAgregar, false);
+        habilitarBoton(btnActualizar, true);
+        habilitarBoton(btnEliminar, true);
     }
 
     private void eliminarCurso() {
@@ -373,14 +478,7 @@ public class FrmCurso extends javax.swing.JFrame {
         if (respuesta != JOptionPane.YES_OPTION) {
             return;
         }
-        boolean eliminado = controlador.eliminarCurso(idSeleccionado);
-        if (eliminado) {
-            cargarCursos();
-            nuevoCurso();
-            mostrarInfo("Curso eliminado correctamente");
-        } else {
-            mostrarError(controlador.getMensajeError());
-        }
+        controlador.eliminarCurso(idSeleccionado);
     }
 
     private boolean camposCompletos() {
@@ -408,15 +506,32 @@ public class FrmCurso extends javax.swing.JFrame {
         limpiarCampos();
         idSeleccionado = null;
         txtIdCurso.setEditable(true);
+        txtIdCurso.setBackground(Color.WHITE);
         jTable1.clearSelection();
-        btnAgregar.setEnabled(true);
-        btnActualizar.setEnabled(false);
-        btnEliminar.setEnabled(false);
+        habilitarBoton(btnAgregar, true);
+        habilitarBoton(btnActualizar, false);
+        habilitarBoton(btnEliminar, false);
         txtIdCurso.requestFocusInWindow();
     }
 
-    private void mostrarError(String mensaje) {
+    @Override
+    public void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void mostrarMensaje(String mensaje) {
+        mostrarInfo(mensaje);
+    }
+
+    @Override
+    public void limpiar() {
+        nuevoCurso();
+    }
+
+    @Override
+    public void refrescarTabla() {
+        cargarCursos();
     }
 
     private void mostrarAviso(String mensaje) {
@@ -427,23 +542,25 @@ public class FrmCurso extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, mensaje, "Informacion", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void aplicarEstilo() {
-        Estilo.logo(lblLogo);
-        Estilo.separador(sepLogo);
-        for (JLabel etiqueta : new JLabel[]{lblIdCurso, lblNombreCurso, lblCreditos, lblCodigoCurso, lblAnioPensum}) {
-            Estilo.etiqueta(etiqueta);
-        }
-        for (JTextField campo : new JTextField[]{txtIdCurso, txtNombreCurso, txtCreditos, txtCodigoCurso, txtAnioPensum}) {
-            Estilo.campo(campo);
-        }
-        Estilo.boton(btnNuevo, Iconos.mas());
-        Estilo.boton(btnConsultarId, Iconos.lupa());
-        Estilo.boton(btnConsultar, Iconos.lupa());
-        Estilo.boton(btnActualizar, Iconos.actualizar());
-        Estilo.boton(btnAgregar, Iconos.guardar());
-        Estilo.boton(btnEliminar, Iconos.basurero());
-        Estilo.tabla(jScrollPane1, jTable1);
-        pack();
+    private void configurarEncabezadoTabla() {
+        jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable1.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable tabla, Object valor, boolean seleccionada,
+                    boolean foco, int fila, int columna) {
+                super.getTableCellRendererComponent(tabla, valor, false, false, fila, columna);
+                setBackground(new Color(15, 52, 96));
+                setForeground(Color.WHITE);
+                setFont(new Font("Segoe UI", Font.BOLD, 13));
+                setBorder(BorderFactory.createEmptyBorder(7, 10, 7, 10));
+                return this;
+            }
+        });
+    }
+
+    private void habilitarBoton(JButton boton, boolean habilitado) {
+        boton.setEnabled(habilitado);
+        boton.setBackground(habilitado ? new Color(15, 52, 96) : new Color(203, 212, 222));
     }
 
     private void configurarRestricciones() {
