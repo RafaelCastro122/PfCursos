@@ -30,7 +30,7 @@ public class Curso {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID es obligatorio");
         }
-        if (!id.matches("[0-9]{3}")) {
+        if (id.length() != 3 || !soloNumeros(id)) {
             throw new IllegalArgumentException("El ID debe tener 3 digitos (ej. 096)");
         }
         if (id.equals("000")) {
@@ -43,12 +43,32 @@ public class Curso {
             return null;
         }
         id = id.trim();
-        if (id.matches("[0-9]{1,3}")) {
+        if (id.length() >= 1 && id.length() <= 3 && soloNumeros(id)) {
             while (id.length() < 3) {
                 id = "0" + id;
             }
         }
         return id;
+    }
+
+    public static boolean soloNumeros(String texto) {
+        for (int i = 0; i < texto.length(); i++) {
+            char caracter = texto.charAt(i);
+            if (caracter < '0' || caracter > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean soloLetras(String texto) {
+        for (int i = 0; i < texto.length(); i++) {
+            char caracter = texto.charAt(i);
+            if (!Character.isLetter(caracter) && caracter != ' ') {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void validarNombre(String nombre) {
@@ -58,7 +78,7 @@ public class Curso {
         if (nombre.length() > 100) {
             throw new IllegalArgumentException("El nombre no puede tener mas de 100 caracteres");
         }
-        if (!nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+        if (!soloLetras(nombre)) {
             throw new IllegalArgumentException("El nombre solo puede contener letras y espacios");
         }
     }

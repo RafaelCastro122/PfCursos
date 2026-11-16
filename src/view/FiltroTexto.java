@@ -28,8 +28,13 @@ public class FiltroTexto extends DocumentFilter {
         if (largoFinal > maximo) {
             return;
         }
-        if (!texto.matches(permitidos)) {
-            return;
+        if (!permitidos.isEmpty()) {
+            for (int i = 0; i < texto.length(); i++) {
+                char caracter = texto.charAt(i);
+                if (permitidos.indexOf(caracter) == -1) {
+                    return;
+                }
+            }
         }
         super.replace(fb, posicion, borrados, texto, attr);
     }

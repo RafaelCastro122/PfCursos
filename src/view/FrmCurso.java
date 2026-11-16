@@ -37,11 +37,11 @@ public class FrmCurso extends javax.swing.JFrame {
         jTable1.getTableHeader().setForeground(Color.WHITE);
         jTable1.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
 
-        ponerFiltro(txtIdCurso, "[0-9]*", 3);
-        ponerFiltro(txtCreditos, "[0-9]*", 2);
-        ponerFiltro(txtNombreCurso, ".*", 100);
-        ponerFiltro(txtCodigoCurso, ".*", 100);
-        ponerFiltro(txtAnioPensum, "[0-9-]*", 10);
+        ponerFiltro(txtIdCurso, "0123456789", 3);
+        ponerFiltro(txtCreditos, "0123456789", 2);
+        ponerFiltro(txtNombreCurso, "", 100);
+        ponerFiltro(txtCodigoCurso, "", 100);
+        ponerFiltro(txtAnioPensum, "0123456789-", 10);
 
         jTable1.getSelectionModel().addListSelectionListener(e -> seleccionarFila());
 
@@ -412,7 +412,7 @@ public class FrmCurso extends javax.swing.JFrame {
             mostrarAviso("Ingrese el ID del curso a buscar");
             return;
         }
-        if (!id.matches("[0-9]{1,3}")) {
+        if (id.length() > 3 || !Curso.soloNumeros(id)) {
             mostrarError("El ID debe ser un numero entero de hasta 3 digitos");
             return;
         }
