@@ -10,6 +10,8 @@ import java.awt.Font;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AbstractDocument;
 import model.Curso;
@@ -18,7 +20,7 @@ import model.Curso;
  *
  * @author navas
  */
-public class FrmCurso extends javax.swing.JFrame {
+public class FrmCurso extends javax.swing.JFrame implements ListSelectionListener {
 
     private CursoController controlador = new CursoController();
     private DefaultTableModel modeloTabla;
@@ -43,7 +45,7 @@ public class FrmCurso extends javax.swing.JFrame {
         ponerFiltro(txtCodigoCurso, "", 100);
         ponerFiltro(txtAnioPensum, "0123456789-", 10);
 
-        jTable1.getSelectionModel().addListSelectionListener(e -> seleccionarFila());
+        jTable1.getSelectionModel().addListSelectionListener(this);
 
         limpiarFormulario();
     }
@@ -534,6 +536,11 @@ public class FrmCurso extends javax.swing.JFrame {
         documento.setDocumentFilter(new FiltroTexto(permitidos, maximo));
     }
 
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        seleccionarFila();
+    }
+
     public void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Informacion", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -550,7 +557,8 @@ public class FrmCurso extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> new FrmCurso().setVisible(true));
+        FrmCurso ventana = new FrmCurso();
+        ventana.setVisible(true);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

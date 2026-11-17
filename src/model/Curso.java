@@ -1,7 +1,6 @@
 package model;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 
 public class Curso {
 
@@ -90,15 +89,40 @@ public class Curso {
     }
 
     public static void validarFecha(String fecha) {
+        String mensaje = "La fecha debe tener el formato AAAA-MM-DD y ser una fecha valida";
         if (fecha == null) {
-            throw new IllegalArgumentException("La fecha debe tener el formato AAAA-MM-DD y ser una fecha valida");
+            throw new IllegalArgumentException(mensaje);
         }
-        LocalDate fechaCurso;
-        try {
-            fechaCurso = LocalDate.parse(fecha.trim());
-        } catch (DateTimeParseException ex) {
-            throw new IllegalArgumentException("La fecha debe tener el formato AAAA-MM-DD y ser una fecha valida");
+        fecha = fecha.trim();
+        if (fecha.length() != 10 || fecha.charAt(4) != '-' || fecha.charAt(7) != '-') {
+            throw new IllegalArgumentException(mensaje);
         }
+        String anioTexto = fecha.substring(0, 4);
+        String mesTexto = fecha.substring(5, 7);
+        String diaTexto = fecha.substring(8, 10);
+        if (!soloNumeros(anioTexto) || !soloNumeros(mesTexto) || !soloNumeros(diaTexto)) {
+            throw new IllegalArgumentException(mensaje);
+        }
+        int anio = Integer.parseInt(anioTexto);
+        int mes = Integer.parseInt(mesTexto);
+        int dia = Integer.parseInt(diaTexto);
+        if (mes < 1 || mes > 12) {
+            throw new IllegalArgumentException(mensaje);
+        }
+        int diasDelMes = 31;
+        if (mes == 4 || mes == 6 || mes == 9 || mes == 11) {
+            diasDelMes = 30;
+        }
+        if (mes == 2) {
+            diasDelMes = 28;
+            if ((anio % 4 == 0 && anio % 100 != 0) || anio % 400 == 0) {
+                diasDelMes = 29;
+            }
+        }
+        if (dia < 1 || dia > diasDelMes) {
+            throw new IllegalArgumentException(mensaje);
+        }
+        LocalDate fechaCurso = LocalDate.of(anio, mes, dia);
         if (fechaCurso.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("La fecha no puede ser futura");
         }

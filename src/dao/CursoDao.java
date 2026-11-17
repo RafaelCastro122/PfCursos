@@ -13,28 +13,12 @@ public class CursoDao {
 
     private final CreateConection connFactory = new CreateConection();
 
-    private void cerrar(ResultSet rs, PreparedStatement ps, Connection conn) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+    private Connection abrirConexion() throws SQLException {
+        Connection conn = connFactory.getConnection();
+        if (conn == null) {
+            throw new SQLException("No fue posible conectarse a la base de datos.");
         }
-        if (ps != null) {
-            try {
-                ps.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
+        return conn;
     }
 
     public List<Curso> obtenerTodos() {
@@ -42,32 +26,14 @@ public class CursoDao {
         String sql = "SELECT id_curso, nombre_curso, credito_curso, codigo_curso, \"año_pensum\" "
                 + "FROM cursos ORDER BY id_curso ASC";
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = connFactory.getConnection();
-            if (conn == null) {
-                return lista;
-            }
-            ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
-
+        try (Connection conn = abrirConexion();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Curso curso = new Curso(
-                        rs.getString("id_curso"),
-                        rs.getString("nombre_curso"),
-                        rs.getInt("credito_curso"),
-                        rs.getString("codigo_curso"),
-                        rs.getString("año_pensum")
-                );
-                lista.add(curso);
+                lista.add(mapear(rs));
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            cerrar(rs, ps, conn);
+        } catch (SQLException e) {
+            System.err.println("No se pudo consultar la lista de cursos.");
         }
         return lista;
     }
@@ -77,32 +43,15 @@ public class CursoDao {
         String sql = "SELECT id_curso, nombre_curso, credito_curso, codigo_curso, \"año_pensum\" "
                 + "FROM cursos WHERE id_curso = ?";
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
-        try {
-            conn = connFactory.getConnection();
-            if (conn == null) {
-                return null;
-            }
-            ps = conn.prepareStatement(sql);
+        try (Connection conn = abrirConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, id);
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                curso = new Curso(
-                        rs.getString("id_curso"),
-                        rs.getString("nombre_curso"),
-                        rs.getInt("credito_curso"),
-                        rs.getString("codigo_curso"),
-                        rs.getString("año_pensum")
-                );
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    curso = mapear(rs);
+                }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            cerrar(rs, ps, conn);
+        } catch (SQLException e) {
+            System.err.println("No se pudo consultar el curso.");
         }
         return curso;
     }
@@ -111,25 +60,15 @@ public class CursoDao {
         String sql = "INSERT INTO cursos (id_curso, nombre_curso, credito_curso, codigo_curso, \"año_pensum\") "
                 + "VALUES (?, ?, ?, ?, ?)";
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-
-        try {
-            conn = connFactory.getConnection();
-            if (conn == null) {
-                return false;
-            }
-            ps = conn.prepareStatement(sql);
+        try (Connection conn = abrirConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, curso.getIdCurso());
             ps.setString(2, curso.getNombreCurso());
             ps.setInt(3, curso.getCreditoCurso());
             ps.setString(4, curso.getCodigoCurso());
             ps.setDate(5, java.sql.Date.valueOf(curso.getAnioPensum()));
             return ps.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            cerrar(null, ps, conn);
+        } catch (SQLException e) {
+            System.err.println("No se pudo guardar el curso.");
         }
         return false;
     }
@@ -138,25 +77,15 @@ public class CursoDao {
         String sql = "UPDATE cursos SET nombre_curso = ?, credito_curso = ?, codigo_curso = ?, \"año_pensum\" = ? "
                 + "WHERE id_curso = ?";
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-
-        try {
-            conn = connFactory.getConnection();
-            if (conn == null) {
-                return false;
-            }
-            ps = conn.prepareStatement(sql);
+        try (Connection conn = abrirConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, curso.getNombreCurso());
             ps.setInt(2, curso.getCreditoCurso());
             ps.setString(3, curso.getCodigoCurso());
             ps.setDate(4, java.sql.Date.valueOf(curso.getAnioPensum()));
             ps.setString(5, curso.getIdCurso());
             return ps.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            cerrar(null, ps, conn);
+        } catch (SQLException e) {
+            System.err.println("No se pudo actualizar el curso.");
         }
         return false;
     }
@@ -164,22 +93,22 @@ public class CursoDao {
     public boolean eliminar(String id) {
         String sql = "DELETE FROM cursos WHERE id_curso = ?";
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-
-        try {
-            conn = connFactory.getConnection();
-            if (conn == null) {
-                return false;
-            }
-            ps = conn.prepareStatement(sql);
+        try (Connection conn = abrirConexion(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, id);
             return ps.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            cerrar(null, ps, conn);
+        } catch (SQLException e) {
+            System.err.println("No se pudo eliminar el curso.");
         }
         return false;
+    }
+
+    private Curso mapear(ResultSet rs) throws SQLException {
+        return new Curso(
+                rs.getString("id_curso"),
+                rs.getString("nombre_curso"),
+                rs.getInt("credito_curso"),
+                rs.getString("codigo_curso"),
+                rs.getString("año_pensum")
+        );
     }
 }
